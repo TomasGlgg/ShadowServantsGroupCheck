@@ -50,10 +50,10 @@ def show_player(url, name):
         # 1 - href, 3 - category, 5 - timestamp
         task_href = list(tr)[1].find('a').get('href')
         category = list(tr)[3].text
-        rate = task_rate(task_href)
-        if rate is None:
-            continue
         if category in categories:
+            rate = task_rate(task_href)
+            if rate is None:
+                continue
             categories_dict[category] += rate
 
     print_name(name)
