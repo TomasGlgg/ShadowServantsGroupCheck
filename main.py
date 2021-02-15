@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from requests import Session
 from json import load, dump, decoder
-from os import listdir
+from os import listdir, chdir, path
 
 
 group_id = 5
@@ -42,7 +42,7 @@ def show_player(url, name):
     categories_dict = {}
     for category in categories:
         categories_dict[category] = 0
-    #  categories_dict = {'Crypto': 0, 'Web': 0 ...}
+    # categories_dict = {'Crypto': 0, 'Web': 0 ...}
 
     for i, tr in enumerate(soup.find_all('tr')):
         if i == 0:
@@ -76,6 +76,7 @@ soup = BeautifulSoup(html, features="html5lib")
 table = soup.find('table').tbody
 
 # load tasks from file
+chdir(path.dirname(__file__))
 if 'task_cache.json' in listdir():
     cache_file = open('task_cache.json', 'r')
     try:
