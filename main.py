@@ -111,29 +111,32 @@ def show_scores(group_id):
         show_player(a.get('href'), name)
 
 
-def find_nick_id(nick):
+def find_nick_urls(nicks):
     html = session.get('{}/score'.format(domain)).text
     soup = BeautifulSoup(html, features="html5lib")
     table = soup.find('table').tbody
+    urls = {}
     for line in table:
         if type(line) == element.Tag:
             current_nick = str(line.contents[1].string).strip()
-            if current_nick == nick:
-                return line.contents[1].next.attrs['href']
+            if current_nick in nicks:
+                urls[current_nick] = line.contents[1].next.attrs['href']
+    return urls
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-i', '--group-id', dest='id', metavar='ID', type=int, default=5,
+    parser.add_argument('-g', '--group-id', dest='id', metavar='ID', type=int, default=5,
                         help='Вывести всех участников группы (по умолчанию: 5)')
-    parser.add_argument('-n', '--nick', dest='nick', metavar='NICK', help='Вывести игрока')
+    parser.add_argument('-n', '--nicks', dest='nicks', metavar='NICK', nargs='+', help='Вывести score игроков')
     args = parser.parse_args()
 
     load_tasks()
     init_table()
-    if args.nick is not None:
-        nick_url = find_nick_id(args.nick)
-        show_player(nick_url, args.nick)
+    if args.nicks is not None:
+        nick_urls = find_nick_urls(args.nicks)
+        for nick, nick_url in nick_urls.items():
+            show_player(nick_url, nick)
     else:
         show_scores(args.id)
     save_tasks()
