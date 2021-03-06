@@ -9,6 +9,17 @@ session_cookie = '<здесь кук "session" из залогиненой се�
 
 # Запуск:
 
+### Справка:
+```shell
+$ python main.py --help
+usage: main.py [-h] [-i ID] [-n NICK]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i ID, --group-id ID  Вывести всех участников группы (по умолчанию: 5)
+  -n NICK, --nick NICK  Вывести игрока
+```
+
 ### Вывести score игрока:
 ```shell
 $ python main.py -n TomasGl
