@@ -1,11 +1,44 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, element
 from requests import Session
 from json import load, dump, decoder
 from os import listdir, chdir, path
+from argparse import ArgumentParser
 
 
-group_id = 5
 session_cookie = '<здесь кук "session" из залогиненой сессии на shadowservants.ru (для доступа к стоимости тасков)>'
+
+categories = 'Crypto', 'Web', 'Networking', 'PPC', 'Forensic', 'PWN', 'Reverse', 'Stegano'
+domain = 'http://shadowservants.ru'
+session = Session()
+session.cookies['session'] = session_cookie
+task_cache = {}
+
+
+def load_tasks():
+    # load tasks from file
+    chdir(path.dirname(__file__))
+    global task_cache
+    if 'task_cache.json' in listdir():
+        cache_file = open('task_cache.json', 'r')
+        try:
+            task_cache = load(cache_file)
+        except decoder.JSONDecodeError:
+            task_cache = {}
+    else:
+        task_cache = {}
+
+
+def save_tasks():
+    cache_file = open('task_cache.json', 'w')
+    dump(task_cache, cache_file)
+    cache_file.close()
+
+
+def init_table():
+    print('Wait...')
+    print(' Name      | Score     ', *['| ' + category + ' ' * (10 - len(category)) for category in categories], '|',
+          sep='')
+    print(('-' * (10 + 1) + '|') * 10, sep='')
 
 
 def print_rate(num):
@@ -15,7 +48,7 @@ def print_rate(num):
 def print_name(name):
     max_len = 10 + 1
     if len(name) > max_len:
-        print(name[:max_len-3]+'...| ', end='')
+        print(name[:max_len - 3] + '...| ', end='')
     else:
         print(name, end=' ' * (max_len - len(name)) + '| ')
 
@@ -60,39 +93,47 @@ def show_player(url, name):
     print_rate(score)
     for category in categories:
         print_rate(categories_dict[category])
-    print('\n', ('-'*(10 + 1) + '|')*10, sep='')
+    print('\n', ('-' * (10 + 1) + '|') * 10, sep='')
 
 
-categories = 'Crypto', 'Web', 'Networking', 'PPC', 'Forensic', 'PWN', 'Reverse', 'Stegano'
-print('Подождите...')
-print(' Name      | Score     ', *['| ' + category + ' '*(10 - len(category)) for category in categories], '|', sep='')
-print(('-'*(10 + 1) + '|')*10, sep='')
+def get_group_players(group_id):
+    html = session.get('{}/score?group_id={}'.format(domain, group_id)).text
+    soup = BeautifulSoup(html, features="html5lib")
+    table = soup.find('table').tbody
+    return table
 
-domain = 'http://shadowservants.ru'
-session = Session()
-session.cookies['session'] = session_cookie
-html = session.get('{}/score?group_id={}'.format(domain, group_id)).text
-soup = BeautifulSoup(html, features="html5lib")
-table = soup.find('table').tbody
 
-# load tasks from file
-chdir(path.dirname(__file__))
-if 'task_cache.json' in listdir():
-    cache_file = open('task_cache.json', 'r')
-    try:
-        task_cache = load(cache_file)
-    except decoder.JSONDecodeError:
-        task_cache = {}
-else:
-    task_cache = {}
+def show_scores(group_id):
+    for tr in get_group_players(group_id):
+        a = tr.find('a')
+        if type(a) == int: continue
+        name = a.text.strip()
+        show_player(a.get('href'), name)
 
-for tr in table:
-    a = tr.find('a')
-    if type(a) == int: continue
-    name = a.text
-    show_player(a.get('href'), name)
 
-# save tasks to file
-cache_file = open('task_cache.json', 'w')
-dump(task_cache, cache_file)
-cache_file.close()
+def find_nick_id(nick):
+    html = session.get('{}/score'.format(domain)).text
+    soup = BeautifulSoup(html, features="html5lib")
+    table = soup.find('table').tbody
+    for line in table:
+        if type(line) == element.Tag:
+            current_nick = str(line.contents[1].string).strip()
+            if current_nick == nick:
+                return line.contents[1].next.attrs['href']
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-i', '--group-id', dest='id', metavar='ID', type=int, default=5,
+                        help='Вывести всех участников группы (по умолчанию: 5)')
+    parser.add_argument('-n', '--nick', dest='nick', metavar='NICK', help='Вывести игрока')
+    args = parser.parse_args()
+
+    load_tasks()
+    init_table()
+    if args.nick is not None:
+        nick_url = find_nick_id(args.nick)
+        show_player(nick_url, args.nick)
+    else:
+        show_scores(args.id)
+    save_tasks()
