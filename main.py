@@ -97,7 +97,11 @@ def show_player(url, name):
 
 
 def get_group_players(group_id):
-    html = session.get('{}/score?group_id={}'.format(domain, group_id)).text
+    try:
+        html = session.get('{}/score?group_id={}'.format(domain, group_id)).text
+    except UnicodeEncodeError:
+        print('I think you forgot to substitute cookies...')
+        exit()
     soup = BeautifulSoup(html, features="html5lib")
     table = soup.find('table').tbody
     return table
