@@ -29,7 +29,7 @@ $ python main.py -n TomasGl enty8080
 ### Вывести score всех участников группы (по умлочанию 5):
 
 ```shell
-$ python main.py -i 5
+$ python main.py -g 5
 ```
 
 # Скриншоты:
