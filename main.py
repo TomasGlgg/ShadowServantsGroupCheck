@@ -16,7 +16,8 @@ task_cache = {}
 
 def load_tasks():
     # load tasks from file
-    chdir(path.dirname(__file__))
+    if path.dirname(__file__):
+        chdir(path.dirname(__file__))
     global task_cache
     if 'task_cache.json' in listdir():
         cache_file = open('task_cache.json', 'r')
