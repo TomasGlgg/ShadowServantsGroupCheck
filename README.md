@@ -1,13 +1,13 @@
 # ShadowServantsGroupCheck
 
-
+# Настройка:
 ### Конфиг в начале скрипта:
 
 ```py
 session_cookie = '<здесь кук "session" из залогиненой сессии на shadowservants.ru (для доступа к стоимости тасков)>'
 ```
 
-# Запуск:
+# Использование:
 
 ### Справка:
 ```shell
@@ -26,7 +26,7 @@ optional arguments:
 $ python main.py -n TomasGl enty8080
 ```
 
-### Вывести score всех участников группы (по умлочанию 5):
+### Вывести score всех участников группы:
 
 ```shell
 $ python main.py -g 5
