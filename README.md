@@ -2,13 +2,11 @@
 
 # Настройка:
 ### Конфиг в начале скрипта:
-
 ```py
 session_cookie = '<здесь кук "session" из залогиненой сессии на shadowservants.ru (для доступа к стоимости тасков)>'
 ```
 
 # Использование:
-
 ### Справка:
 ```shell
 $ python main.py --help
@@ -27,12 +25,16 @@ $ python main.py -n TomasGl enty8080
 ```
 
 ### Вывести score всех участников группы:
-
 ```shell
 $ python main.py -g 5
 ```
 
 # Скриншоты:
-
 ![img.png](screenshot1.png)
 ![img.png](screenshot2.png)
+
+# Online версия:
+```shell
+nc home.tomasgl.ru 13371
+```
+* Таблица обновляется каждые 30 минут
