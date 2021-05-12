@@ -3,15 +3,20 @@ from requests import Session
 from json import load, dump, decoder
 from os import listdir, chdir, path
 from argparse import ArgumentParser
+from difflib import SequenceMatcher
 
 
 session_cookie = '<здесь кук "session" из залогиненой сессии на shadowservants.ru (для доступа к стоимости тасков)>'
 
-categories = 'Crypto', 'Web', 'Networking', 'PPC', 'Forensic', 'PWN', 'Reverse', 'Stegano'
+categories = 'Crypto', 'Web', 'Networking', 'PPC', 'Forensic', 'PWN', 'Reverse', 'Stegano', 'Other'
 domain = 'http://shadowservants.ru'
 session = Session()
 session.cookies['session'] = session_cookie
 task_cache = {}
+
+
+def diff(s1, s2):
+    return SequenceMatcher(None, s1.lower(), s2.lower()).ratio()
 
 
 def load_tasks():
@@ -34,11 +39,15 @@ def save_tasks():
     cache_file.close()
 
 
+def print_separator():
+    print(('-' * (10 + 1) + '|') * (len(categories) + 2), sep='')
+
+
 def init_table():
     print('Wait...')
     print(' Name      | Score     ', *['| ' + category + ' ' * (10 - len(category)) for category in categories], '|',
           sep='')
-    print(('-' * (10 + 1) + '|') * 10, sep='')
+    print_separator()
 
 
 def print_rate(num):
@@ -67,6 +76,15 @@ def task_rate(url):
     return rate
 
 
+def task_category(current_category):
+    if current_category in categories:
+        return current_category
+    for correct_category in categories:
+        if diff(current_category, correct_category) > 0.8:
+            return correct_category
+    return 'Other'
+
+
 def show_player(url, name):
     player_html = session.get(domain + url).text
     soup = BeautifulSoup(player_html, 'lxml')
@@ -82,7 +100,7 @@ def show_player(url, name):
             continue
         # 1 - href, 3 - category, 5 - timestamp
         task_href = list(tr)[1].find('a').get('href')
-        category = list(tr)[3].text.replace('Stego', 'Stegano')
+        category = task_category(list(tr)[3].text)
         if category in categories:
             rate = task_rate(task_href)
             if rate is None:
@@ -93,7 +111,8 @@ def show_player(url, name):
     print_rate(score)
     for category in categories:
         print_rate(categories_dict[category])
-    print('\n', ('-' * (10 + 1) + '|') * 10, sep='')
+    print()
+    print_separator()
 
 
 def get_group_players(group_id):
