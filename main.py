@@ -51,7 +51,7 @@ def init_table():
 
 
 def print_rate(num):
-    print(str(num), end=' ' * (10 - len(str(num))) + '| ')
+    print(str(num).ljust(10), end='| ')
 
 
 def print_name(name):
@@ -59,7 +59,7 @@ def print_name(name):
     if len(name) > max_len:
         print(name[:max_len - 3] + '...| ', end='')
     else:
-        print(name, end=' ' * (max_len - len(name)) + '| ')
+        print(name.ljust(max_len), end='| ')
 
 
 def task_rate(url):
