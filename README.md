@@ -37,4 +37,3 @@ $ python main.py -g 5
 ```shell
 nc home.tomasgl.ru 13371
 ```
-* Таблица обновляется каждые 30 минут
