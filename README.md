@@ -32,8 +32,3 @@ $ python main.py -g 5
 # Скриншоты:
 ![img.png](screenshot1.png)
 ![img.png](screenshot2.png)
-
-# Online версия:
-```shell
-nc home.tomasgl.ru 13371
-```
